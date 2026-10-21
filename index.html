@@ -290,18 +290,13 @@
     <div class="contact-location-grid">
       <div class="contact-col">
         <!--
-          Envío de mail vía FormSubmit.co (sin backend propio).
-          Dirección real del estudio (activar cuando se confirme la casilla en FormSubmit.co):
-          action="https://formsubmit.co/estudio.gonzalezpires@gmail.com"
-          Por ahora, para pruebas, apunta a una casilla de prueba. La primera vez que se
-          envíe un formulario a una casilla nueva, FormSubmit manda un mail de confirmación
-          a esa casilla que hay que abrir y confirmar; recién después empiezan a llegar
-          las consultas reales (con los adjuntos incluidos).
+          Envío de mail vía una Netlify Function propia (netlify/functions/send-consultation.js)
+          que usa la API de Resend: mail con diseño de marca y adjuntos sin las limitaciones
+          de FormSubmit/EmailJS free. Necesita la variable de entorno RESEND_API_KEY cargada
+          en Netlify (Site settings > Environment variables); CONTACT_EMAIL es opcional
+          (por defecto manda a ipseidor@gmail.com, cambiar a la casilla real del estudio).
         -->
-        <form class="contact-form" id="contact-form" action="https://formsubmit.co/ipseidor@gmail.com" method="POST" enctype="multipart/form-data">
-          <input type="hidden" name="_subject" value="Nueva consulta desde la web - González & Pires">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_captcha" value="false">
+        <form class="contact-form" id="contact-form">
           <label>NOMBRE Y APELLIDO
             <input type="text" name="nombre" placeholder="Ej: Juan Pérez" required>
           </label>
@@ -340,18 +335,11 @@
               <p class="dropzone-hint">PDF, JPG, PNG o DOCX</p>
               <span class="btn btn-gold dropzone-browse-btn">Elegir archivos</span>
               <input type="file" id="adjuntos-input" multiple hidden>
-              <!-- FormSubmit adjunta por varios inputs con nombre propio (no por un solo
-                   input "multiple"): ver documentación, sección File Uploads. El JS reparte
-                   acá los archivos elegidos/soltados en el dropzone. -->
-              <input type="file" name="attachment" id="attachment-1" hidden>
-              <input type="file" name="attachment2" id="attachment-2" hidden>
-              <input type="file" name="attachment3" id="attachment-3" hidden>
-              <input type="file" name="attachment4" id="attachment-4" hidden>
-              <input type="file" name="attachment5" id="attachment-5" hidden>
               <ul class="dropzone-filelist" id="dropzone-filelist"></ul>
             </div>
           </label>
-          <button type="submit" class="btn btn-gold btn-block">ENVIAR MI CONSULTA</button>
+          <p class="form-status" id="form-status" role="status" hidden></p>
+          <button type="submit" class="btn btn-gold btn-block" id="form-submit-btn">ENVIAR MI CONSULTA</button>
         </form>
       </div>
 

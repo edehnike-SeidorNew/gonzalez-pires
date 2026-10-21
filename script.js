@@ -20,42 +20,56 @@ document.querySelectorAll('.faq-item').forEach(item => {
   });
 });
 
-// Contact form: se envía por mail vía FormSubmit (ver comentario en index.html), sin JS extra.
-
-// Dropzone de documentación adjunta.
-// FormSubmit no adjunta de forma confiable con un solo input "multiple": hay que
-// repartir cada archivo en su propio input (attachment, attachment2, ...).
+// Contact form: envía por una Netlify Function propia (netlify/functions/send-consultation.js)
+// que usa Resend, así el mail sale con el diseño de la marca y sin los límites de
+// adjuntos de FormSubmit/EmailJS free. Ver comentario en index.html.
 const dropzone = document.getElementById('dropzone');
 const dropzoneInput = document.getElementById('adjuntos-input');
 const dropzoneFileList = document.getElementById('dropzone-filelist');
-const dropzoneHiddenInputs = [
-  document.getElementById('attachment-1'),
-  document.getElementById('attachment-2'),
-  document.getElementById('attachment-3'),
-  document.getElementById('attachment-4'),
-  document.getElementById('attachment-5'),
-];
-if (dropzone && dropzoneInput && dropzoneFileList && dropzoneHiddenInputs[0]) {
-  const assignFiles = (fileList) => {
-    const files = Array.from(fileList).slice(0, dropzoneHiddenInputs.length);
-    dropzoneHiddenInputs.forEach((input, i) => {
-      const dt = new DataTransfer();
-      if (files[i]) dt.items.add(files[i]);
-      input.files = dt.files;
-    });
-    dropzoneFileList.innerHTML = '';
-    files.forEach(file => {
-      const li = document.createElement('li');
-      li.textContent = file.name;
-      dropzoneFileList.appendChild(li);
-    });
-    if (fileList.length > dropzoneHiddenInputs.length) {
-      const li = document.createElement('li');
-      li.textContent = `+${fileList.length - dropzoneHiddenInputs.length} sin incluir (máx. ${dropzoneHiddenInputs.length})`;
-      dropzoneFileList.appendChild(li);
-    }
-  };
-  dropzoneInput.addEventListener('change', () => assignFiles(dropzoneInput.files));
+const contactForm = document.getElementById('contact-form');
+const formStatus = document.getElementById('form-status');
+const formSubmitBtn = document.getElementById('form-submit-btn');
+const MAX_FILES = 5;
+const MAX_TOTAL_SIZE = 4 * 1024 * 1024; // 4MB: margen bajo el límite de la function (6MB con el resto del payload)
+
+let selectedFiles = [];
+
+const renderFileNames = () => {
+  dropzoneFileList.innerHTML = '';
+  selectedFiles.forEach(file => {
+    const li = document.createElement('li');
+    li.textContent = file.name;
+    dropzoneFileList.appendChild(li);
+  });
+};
+
+const addFiles = (fileList) => {
+  const incoming = Array.from(fileList);
+  const skipped = selectedFiles.length + incoming.length - MAX_FILES;
+  selectedFiles = [...selectedFiles, ...incoming].slice(0, MAX_FILES);
+  renderFileNames();
+  if (skipped > 0) {
+    const li = document.createElement('li');
+    li.textContent = `+${skipped} sin incluir (máx. ${MAX_FILES})`;
+    dropzoneFileList.appendChild(li);
+  }
+};
+
+const fileToBase64 = (file) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(String(reader.result).split(',')[1]);
+  reader.onerror = reject;
+  reader.readAsDataURL(file);
+});
+
+const setFormStatus = (message, type) => {
+  formStatus.hidden = false;
+  formStatus.textContent = message;
+  formStatus.className = `form-status form-status-${type}`;
+};
+
+if (dropzone && dropzoneInput && dropzoneFileList) {
+  dropzoneInput.addEventListener('change', () => addFiles(dropzoneInput.files));
   ['dragenter', 'dragover'].forEach(evt => {
     dropzone.addEventListener(evt, (e) => {
       e.preventDefault();
@@ -70,7 +84,55 @@ if (dropzone && dropzoneInput && dropzoneFileList && dropzoneHiddenInputs[0]) {
   });
   dropzone.addEventListener('drop', (e) => {
     if (e.dataTransfer && e.dataTransfer.files.length) {
-      assignFiles(e.dataTransfer.files);
+      addFiles(e.dataTransfer.files);
+    }
+  });
+}
+
+if (contactForm && formStatus && formSubmitBtn) {
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const totalSize = selectedFiles.reduce((sum, f) => sum + f.size, 0);
+    if (totalSize > MAX_TOTAL_SIZE) {
+      setFormStatus('Los archivos adjuntos pesan demasiado (máx. 4MB en total). Quitá alguno e intentá de nuevo.', 'error');
+      return;
+    }
+
+    formSubmitBtn.disabled = true;
+    formSubmitBtn.textContent = 'ENVIANDO...';
+
+    try {
+      const data = new FormData(contactForm);
+      const adjuntos = await Promise.all(selectedFiles.map(async file => ({
+        name: file.name,
+        content: await fileToBase64(file),
+      })));
+
+      const res = await fetch('/.netlify/functions/send-consultation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: data.get('nombre'),
+          telefono: data.get('telefono'),
+          email: data.get('email'),
+          area: data.get('area'),
+          detalle: data.get('detalle'),
+          adjuntos,
+        }),
+      });
+
+      if (!res.ok) throw new Error('No se pudo enviar');
+
+      setFormStatus('¡Listo! Recibimos tu consulta, te contactamos a la brevedad.', 'ok');
+      contactForm.reset();
+      selectedFiles = [];
+      renderFileNames();
+    } catch (err) {
+      setFormStatus('Hubo un error al enviar. Probá de nuevo o escribinos por WhatsApp.', 'error');
+    } finally {
+      formSubmitBtn.disabled = false;
+      formSubmitBtn.textContent = 'ENVIAR MI CONSULTA';
     }
   });
 }
