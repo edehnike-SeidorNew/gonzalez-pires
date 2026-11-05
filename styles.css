@@ -37,18 +37,20 @@ img{max-width:100%;display:block;}
 }
 
 /* ---------- HEADER ---------- */
+/* position:fixed en vez de sticky: con el escalado de pantalla de Windows
+   (125%/150%) "sticky" redondeaba mal los subpíxeles y dejaba asomar una
+   línea del fondo de la página arriba del header al scrollear. Fixed no
+   sufre ese recálculo porque queda anclado directo al viewport. */
 .site-header{
-  position:sticky;
+  position:fixed;
   top:0;
+  left:0;
+  right:0;
   z-index:100;
   background:var(--brand-blue);
   border-bottom:1px solid rgba(255,255,255,.08);
-  /* Con el zoom/escalado de Windows (125%/150%) el navegador a veces redondea
-     mal el "sticky" y deja asomar 1-2px del fondo blanco de la página arriba
-     del header. Este box-shadow pinta ese huequito con el mismo navy,
-     independientemente del zoom, sin afectar el layout. */
-  box-shadow:0 -4px 0 0 var(--brand-blue);
 }
+body{padding-top:72px;}
 .header-inner{
   display:flex;
   align-items:center;
