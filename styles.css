@@ -51,16 +51,21 @@ img{max-width:100%;display:block;}
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 body{padding-top:72px;}
+/* Grid de 3 columnas con los dos costados en 1fr (el mismo peso elástico):
+   así se reparte el espacio sobrante en partes iguales entre logo y botón,
+   sin importar cuánto ocupe cada uno, y la columna del medio (el menú)
+   siempre cae en el centro real del header. */
 .header-inner{
-  position:relative;
-  display:flex;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
   align-items:center;
-  justify-content:space-between;
   height:72px;
   width:100%;
   padding:0 clamp(24px, 5vw, 64px);
 }
+.nav-group{display:contents;}
 .logo{
+  grid-column:1;
   display:flex;
   align-items:center;
   gap:10px;
@@ -72,21 +77,15 @@ body{padding-top:72px;}
 }
 .logo span{color:var(--gold-light);}
 .logo-img{height:54px;width:auto;display:block;}
-/* El nav (con el botón adentro) se saca del flujo y se centra con
-   left:50%/transform, anclado al centro real de TODO el header — así
-   queda centrado sin importar cuánto ocupen el logo o el lado derecho
-   (a diferencia de centrarlo en una columna de grid, que se corre si
-   los costados no pesan lo mismo). */
 .nav{
+  grid-column:2;
   display:flex;
   gap:28px;
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%, -50%);
-  width:max-content;
+  justify-self:center;
   white-space:nowrap;
 }
+.nav-cta{grid-column:3;justify-self:end;}
+.burger{grid-column:3;justify-self:end;}
 .nav a:not(.nav-cta){
   color:var(--gold-light);
   font-size:.78rem;
@@ -100,7 +99,6 @@ body{padding-top:72px;}
   top:3px;
 }
 .nav a:not(.nav-cta):hover{color:#fff;}
-.nav-cta{margin-left:20px;}
 .burger{
   display:none;
   flex-direction:column;
@@ -916,17 +914,16 @@ body{padding-top:72px;}
    medianas de tablet; pasa a hamburguesa antes que el resto de los cambios
    de una sola columna, que recién hacen falta en celulares. */
 @media (max-width: 900px){
+  .header-inner{display:flex;justify-content:space-between;}
   .nav{display:none;}
+  .nav-cta{display:none;}
   .burger{display:flex;}
-  .site-header.open .nav{
+  .site-header.open .nav-group{
     display:flex;
     flex-direction:column;
     align-items:flex-start;
     position:absolute;
     top:72px;left:0;right:0;
-    transform:none;
-    width:auto;
-    white-space:normal;
     background:var(--brand-blue);
     padding:20px 24px 28px;
     gap:18px;
@@ -934,7 +931,14 @@ body{padding-top:72px;}
     max-height:calc(100vh - 72px);
     overflow-y:auto;
   }
-  .site-header.open .nav-cta{margin:4px 0 0;}
+  .site-header.open .nav{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    white-space:normal;
+    gap:18px;
+  }
+  .site-header.open .nav-cta{display:block;margin:4px 0 0;}
 }
 
 @media (max-width: 760px){
