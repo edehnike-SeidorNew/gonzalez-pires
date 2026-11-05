@@ -52,16 +52,13 @@ img{max-width:100%;display:block;}
 }
 body{padding-top:72px;}
 .header-inner{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
+  display:flex;
   align-items:center;
-  column-gap:24px;
+  justify-content:space-between;
   height:72px;
   width:100%;
   padding:0 clamp(24px, 5vw, 64px);
 }
-.header-inner .nav{justify-content:center;}
-.header-inner .burger{justify-self:end;}
 .logo{
   display:flex;
   align-items:center;
