@@ -43,6 +43,11 @@ img{max-width:100%;display:block;}
   z-index:100;
   background:var(--brand-blue);
   border-bottom:1px solid rgba(255,255,255,.08);
+  /* Con el zoom/escalado de Windows (125%/150%) el navegador a veces redondea
+     mal el "sticky" y deja asomar 1-2px del fondo blanco de la página arriba
+     del header. Este box-shadow pinta ese huequito con el mismo navy,
+     independientemente del zoom, sin afectar el layout. */
+  box-shadow:0 -4px 0 0 var(--brand-blue);
 }
 .header-inner{
   display:flex;
