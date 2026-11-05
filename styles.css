@@ -96,6 +96,11 @@ body{padding-top:72px;}
   font-weight:600;
   letter-spacing:.05em;
   transition:color .2s;
+  /* Lora (logo) e Inter (menú) tienen métricas de línea distintas: aunque
+     ambos bloques quedan centrados por igual, el texto del menú se ve un
+     poco más arriba que "GONZÁLEZ & PIRES". Este ajuste fino los empareja. */
+  position:relative;
+  top:3px;
 }
 .nav a:not(.nav-cta):hover{color:#fff;}
 .nav-cta{margin-left:20px;}
