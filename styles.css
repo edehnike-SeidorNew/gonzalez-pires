@@ -52,7 +52,6 @@ img{max-width:100%;display:block;}
 }
 body{padding-top:72px;}
 .header-inner{
-  position:relative;
   display:grid;
   grid-template-columns:auto 1fr auto;
   align-items:center;
@@ -63,17 +62,6 @@ body{padding-top:72px;}
 }
 .header-inner .nav{justify-content:center;}
 .header-inner .burger{justify-self:end;}
-/* El botón ESCRIBINOS vive dentro de <nav> en el HTML (necesario para que
-   en el menú mobile se apile debajo de los links), pero visualmente en
-   desktop queda anclado aparte, pegado al borde derecho del header, para
-   que los links de arriba quedino centrados solo entre ellos. */
-.nav-cta{
-  position:absolute;
-  top:50%;
-  right:clamp(24px, 5vw, 64px);
-  transform:translateY(-50%);
-  margin:0;
-}
 .logo{
   display:flex;
   align-items:center;
@@ -934,7 +922,7 @@ body{padding-top:72px;}
     max-height:calc(100vh - 72px);
     overflow-y:auto;
   }
-  .site-header.open .nav-cta{position:static;transform:none;margin:4px 0 0;}
+  .site-header.open .nav-cta{margin:4px 0 0;}
 }
 
 @media (max-width: 760px){
