@@ -52,16 +52,14 @@ img{max-width:100%;display:block;}
 }
 body{padding-top:72px;}
 .header-inner{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
+  position:relative;
+  display:flex;
   align-items:center;
-  column-gap:24px;
+  justify-content:space-between;
   height:72px;
   width:100%;
   padding:0 clamp(24px, 5vw, 64px);
 }
-.header-inner .nav{justify-content:center;}
-.header-inner .burger{justify-self:end;}
 .logo{
   display:flex;
   align-items:center;
@@ -74,9 +72,20 @@ body{padding-top:72px;}
 }
 .logo span{color:var(--gold-light);}
 .logo-img{height:54px;width:auto;display:block;}
+/* El nav (con el botón adentro) se saca del flujo y se centra con
+   left:50%/transform, anclado al centro real de TODO el header — así
+   queda centrado sin importar cuánto ocupen el logo o el lado derecho
+   (a diferencia de centrarlo en una columna de grid, que se corre si
+   los costados no pesan lo mismo). */
 .nav{
   display:flex;
   gap:28px;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+  width:max-content;
+  white-space:nowrap;
 }
 .nav a:not(.nav-cta){
   color:var(--gold-light);
@@ -915,6 +924,9 @@ body{padding-top:72px;}
     align-items:flex-start;
     position:absolute;
     top:72px;left:0;right:0;
+    transform:none;
+    width:auto;
+    white-space:normal;
     background:var(--brand-blue);
     padding:20px 24px 28px;
     gap:18px;
