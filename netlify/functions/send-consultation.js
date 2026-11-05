@@ -13,28 +13,60 @@ const escapeHtml = (value) =>
     "'": '&#39;',
   }[c]));
 
+// Netlify expone la URL del propio sitio desplegado en process.env.URL; se
+// usa para que el logo del mail cargue desde una imagen alojada y pública
+// (los data URI embebidos no siempre andan bien en clientes de correo).
+const SITE_URL = process.env.URL || 'https://gonzalezypires.netlify.app';
+
+const campo = (label, valor) => `
+        <tr>
+          <td style="padding:10px 0;border-bottom:1px solid #eef0f4;">
+            <p style="margin:0 0 3px;color:#9a7a53;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">${label}</p>
+            <p style="margin:0;color:#1c2135;font-size:15px;font-weight:600;">${valor}</p>
+          </td>
+        </tr>`;
+
 const buildHtml = ({ nombre, telefono, email, area, detalle }) => `
 <div style="font-family:Arial,Helvetica,sans-serif;background:#eef0f4;padding:32px 16px;">
   <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e3e5ea;">
-    <div style="background:#0f1e3f;padding:24px 32px;">
-      <span style="font-family:Georgia,serif;font-weight:700;font-size:20px;color:#cdaa80;">GONZÁLEZ <span style="color:#997953;">&amp;</span> PIRES</span>
-    </div>
-    <div style="padding:32px;">
-      <h2 style="font-family:Georgia,serif;color:#1c2135;margin:0 0 20px;font-size:20px;">Nueva consulta desde la web</h2>
-      <table style="width:100%;border-collapse:collapse;font-size:14px;color:#1c2135;">
-        <tr><td style="padding:8px 0;color:#5b6172;width:140px;vertical-align:top;">Nombre</td><td style="padding:8px 0;font-weight:600;">${escapeHtml(nombre)}</td></tr>
-        <tr><td style="padding:8px 0;color:#5b6172;vertical-align:top;">Teléfono</td><td style="padding:8px 0;font-weight:600;">${escapeHtml(telefono)}</td></tr>
-        <tr><td style="padding:8px 0;color:#5b6172;vertical-align:top;">Email</td><td style="padding:8px 0;font-weight:600;">${escapeHtml(email)}</td></tr>
-        <tr><td style="padding:8px 0;color:#5b6172;vertical-align:top;">Área</td><td style="padding:8px 0;font-weight:600;">${escapeHtml(area || 'Consulta general')}</td></tr>
+
+    <div style="background:#0f1e3f;padding:22px 32px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="padding-right:12px;"><img src="${SITE_URL}/img/logo.png" width="36" height="36" alt="" style="display:block;"></td>
+          <td style="font-family:Georgia,serif;font-weight:700;font-size:20px;color:#cdaa80;white-space:nowrap;">GONZÁLEZ <span style="color:#997953;">&amp;</span> PIRES</td>
+        </tr>
       </table>
-      <div style="margin-top:20px;padding-top:20px;border-top:1px solid #e3e5ea;">
-        <p style="color:#5b6172;font-size:12px;margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em;">Detalle del caso</p>
-        <p style="color:#1c2135;font-size:14px;line-height:1.6;white-space:pre-wrap;margin:0;">${escapeHtml(detalle) || '(sin detalle)'}</p>
+    </div>
+
+    <div style="padding:32px 32px 8px;">
+      <h2 style="font-family:Georgia,serif;color:#1c2135;margin:0 0 10px;font-size:21px;">Nueva consulta desde la web</h2>
+      <div style="width:44px;height:3px;background:#cdaa80;margin:0 0 24px;"></div>
+      <table style="width:100%;border-collapse:collapse;">
+        ${campo('Nombre', escapeHtml(nombre))}
+        ${campo('Teléfono', escapeHtml(telefono))}
+        ${campo('Email', escapeHtml(email))}
+        ${campo('Área de consulta', escapeHtml(area || 'Consulta general'))}
+      </table>
+      <div style="margin-top:22px;padding:18px 20px;background:#f8f6f2;border-radius:10px;border:1px solid #eee3d3;">
+        <p style="color:#9a7a53;font-size:10px;margin:0 0 8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Detalle del caso</p>
+        <p style="color:#1c2135;font-size:14px;line-height:1.65;white-space:pre-wrap;margin:0;">${escapeHtml(detalle) || '(sin detalle)'}</p>
       </div>
+      <p style="margin:22px 0 0;color:#9aa0b4;font-size:11px;">Para responder, contestá directo a este mail — el Reply-To ya queda configurado a la casilla del cliente.</p>
     </div>
-    <div style="background:#eef0f4;padding:16px 32px;text-align:center;">
-      <span style="font-size:11px;color:#5b6172;">Estudio Jurídico Integral · González &amp; Pires</span>
+
+    <div style="background-color:#0f1e3f;background-image:url('${SITE_URL}/img/footer-bg.jpg');background-size:cover;background-position:center;" bgcolor="#0f1e3f" background="${SITE_URL}/img/footer-bg.jpg">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>
+          <td align="center" style="padding:30px 32px 24px;background:linear-gradient(rgba(15,30,63,.82),rgba(15,30,63,.9));">
+            <img src="${SITE_URL}/img/logo.png" width="44" height="44" alt="" style="display:block;margin:0 auto 10px;">
+            <p style="margin:0 0 4px;font-family:Georgia,serif;font-weight:700;font-size:15px;color:#cdaa80;letter-spacing:.02em;">GONZÁLEZ &amp; PIRES</p>
+            <p style="margin:0;color:#c7cade;font-size:11px;">Estudio Jurídico Integral · Penal · Familia · Laboral</p>
+          </td>
+        </tr>
+      </table>
     </div>
+
   </div>
 </div>`;
 

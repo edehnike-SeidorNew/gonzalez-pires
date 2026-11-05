@@ -68,14 +68,14 @@ img{max-width:100%;display:block;}
   display:flex;
   gap:28px;
 }
-.nav a{
+.nav a:not(.nav-cta){
   color:var(--gold-light);
   font-size:.78rem;
   font-weight:600;
   letter-spacing:.05em;
   transition:color .2s;
 }
-.nav a:hover{color:#fff;}
+.nav a:not(.nav-cta):hover{color:#fff;}
 .nav-cta{margin-left:20px;}
 .burger{
   display:none;
@@ -113,7 +113,7 @@ img{max-width:100%;display:block;}
 /* ---------- HERO ---------- */
 .hero{
   background:
-    linear-gradient(rgba(23,27,43,.82), rgba(26,42,94,.82)),
+    linear-gradient(rgba(23,27,43,.9), rgba(26,42,94,.9)),
     url('img/home.jpg') center / cover no-repeat;
   color:#fff;
   text-align:center;
@@ -849,7 +849,7 @@ img{max-width:100%;display:block;}
 .wa-float{
   position:fixed;
   right:24px;
-  bottom:24px;
+  bottom:80px;
   width:58px;height:58px;
   background:var(--wa-green);
   border-radius:50%;
@@ -892,24 +892,22 @@ img{max-width:100%;display:block;}
    medianas de tablet; pasa a hamburguesa antes que el resto de los cambios
    de una sola columna, que recién hacen falta en celulares. */
 @media (max-width: 900px){
-  .nav,.nav-cta{display:none;}
+  .nav{display:none;}
   .burger{display:flex;}
   .site-header.open .nav{
     display:flex;
     flex-direction:column;
+    align-items:flex-start;
     position:absolute;
     top:72px;left:0;right:0;
     background:var(--brand-blue);
-    padding:20px 24px;
+    padding:20px 24px 28px;
     gap:18px;
     border-top:1px solid rgba(255,255,255,.08);
+    max-height:calc(100vh - 72px);
+    overflow-y:auto;
   }
-  .site-header.open .nav-cta{
-    display:block;
-    position:absolute;
-    top:calc(72px + 220px);
-    left:24px;
-  }
+  .site-header.open .nav-cta{margin:4px 0 0;}
 }
 
 @media (max-width: 760px){
